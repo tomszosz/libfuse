@@ -194,7 +194,9 @@ static int may_unmount(const char *mnt, int quiet)
 	if (user == NULL)
 		return -1;
 
-	/* more details about file  */
+	/* OCEAN_IO_IGNORE_MISSING_MTAB start
+		mtab missing file ignore
+	*/
 	FILE * pFile;
 
 	pFile = fopen (mtab, "r");
@@ -202,18 +204,13 @@ static int may_unmount(const char *mnt, int quiet)
 		fprintf(stderr, "%s: TSZZ file %s can be open for read\n", progname, mtab);
 		fclose (pFile);
 	} else {
-		fprintf(stderr, "%s: TSZZ file %s does not exists\nExiting anyway.\nAlready unmounted...\n", progname, mtab);
-		return 0;
+		const char* ignore_missing_mtab = getenv("OCEAN_IO_IGNORE_MISSING_MTAB");
+		if (ignore_missing_mtab != NULL && strcmp(ignore_missing_mtab,"TRUE") == 0) {
+			fprintf(stderr, "%s: TSZZ file %s does not exists\nExiting anyway.\nOCEAN_IO_IGNORE_MISSING_MTAB=%s\n", progname, mtab, ignore_missing_mtab);
+			return 0;
+		}
 	}
-	char file_name[] = "/etc/fstab";
-	pFile = fopen (file_name, "r");
-	if (pFile!=NULL) {
-		fprintf(stderr, "%s: TSZZ file %s can be open for read\n", progname, file_name);
-		fclose (pFile);
-	} else {
-		fprintf(stderr, "%s: TSZZ file %s does not exists\n", progname, file_name);
-	}
-	/*    */
+	/*  OCEAN_IO_IGNORE_MISSING_MTAB end */
 
 	fp = setmntent(mtab, "r");
 	if (fp == NULL) {
