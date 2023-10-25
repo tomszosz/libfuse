@@ -202,7 +202,7 @@ static int may_unmount(const char *mnt, int quiet)
 		fprintf(stderr, "%s: TSZZ file %s can be open for read\n", progname, mtab);
 		fclose (pFile);
 	} else {
-		fprintf(stderr, "%s: TSZZ file %s does not exists\nExiting anyway.\n Already unmounted ?", progname, mtab);
+		fprintf(stderr, "%s: TSZZ file %s does not exists\nExiting anyway.\nAlready unmounted...\n", progname, mtab);
 		return 0;
 	}
 	char file_name[] = "/etc/fstab";
