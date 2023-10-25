@@ -194,6 +194,28 @@ static int may_unmount(const char *mnt, int quiet)
 	if (user == NULL)
 		return -1;
 
+	/* more details about file  */
+	FILE * pFile;
+
+	pFile = fopen (mtab, "r");
+	if (pFile!=NULL)
+	{
+		fprintf(stderr, "%s: TSZZ file %s can be open for read\n", progname, mtab)
+		fclose (pFile);
+	} else {
+		fprintf(stderr, "%s: TSZZ file %s does not exists\n", progname, mtab)
+	}
+	char file_name[] = "/etc/fstab";
+	pFile = fopen (file_name, "r");
+	if (pFile!=NULL)
+	{
+		fprintf(stderr, "%s: TSZZ file %s can be open for read\n", progname, file_name)
+		fclose (pFile);
+	} else {
+		fprintf(stderr, "%s: TSZZ file %s does not exists\n", progname, file_name)
+	}
+	/*    */
+
 	fp = setmntent(mtab, "r");
 	if (fp == NULL) {
 		fprintf(stderr, "%s: failed [:199] to open %s: %s\n", progname, mtab,
