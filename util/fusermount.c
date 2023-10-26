@@ -41,7 +41,6 @@
 static const char *progname;
 
 static int user_allow_other = 0;
-static int allow_missing_mtab = 0;
 static int mount_max = 1000;
 
 static int auto_unmount = 0;
@@ -189,6 +188,7 @@ static int may_unmount(const char *mnt, int quiet)
 	char uidstr[32];
 	unsigned uidlen = 0;
 	int found;
+	int allow_missing_mtab = 1;
 	const char *mtab = _PATH_MOUNTED;
 
 	user = get_user_name();
@@ -200,14 +200,13 @@ static int may_unmount(const char *mnt, int quiet)
 		in case of kubernetes mtab is linked to mounts
 		/etc/mtab -> ../proc/self/mounts
 	*/
-	if (allow_missing_mtab) {
+	if (allow_missing_mtab == 1) {
 
 		FILE * pFile;
 		pFile = fopen (mtab, "r");
 		if (pFile!=NULL) {
 			fclose (pFile);
 		} else {
-			
 			fprintf(stderr, "%s: INFO: file %s does not exists\nExiting ...\n", progname, mtab);
 			return 0;
 		}
@@ -570,8 +569,6 @@ static void parse_line(char *line, int linenum)
 	int tmp;
 	if (strcmp(line, "user_allow_other") == 0)
 		user_allow_other = 1;
-	else if (strcmp(line, "allow_missing_mtab") == 0)
-		allow_missing_mtab = 1;
 	else if (sscanf(line, "mount_max = %i", &tmp) == 1)
 		mount_max = tmp;
 	else if(line[0])
