@@ -204,9 +204,10 @@ static int may_unmount(const char *mnt, int quiet)
 		fprintf(stderr, "%s: TSZZ file %s can be open for read\n", progname, mtab);
 		fclose (pFile);
 	} else {
-		const char* ignore_missing_mtab = getenv("OCEAN_IO_IGNORE_MISSING_MTAB");
+		char* ignore_missing_mtab;
+		ignore_missing_mtab = getenv("OCEAN_IO_IGNORE_MISSING_MTAB");
 		fprintf(stderr, "%s: TSZZ file %s does not exists\nOCEAN_IO_IGNORE_MISSING_MTAB=%s\n", progname, mtab, ignore_missing_mtab);
-		if (ignore_missing_mtab != NULL && strcmp(ignore_missing_mtab,"TRUE") == 0) {
+		if (ignore_missing_mtab != NULL && strcmp(ignore_missing_mtab, "TRUE") == 0) {
 			fprintf(stderr, "%s: TSZZ file %s does not exists\nExiting anyway.\nOCEAN_IO_IGNORE_MISSING_MTAB=%s\n", progname, mtab, ignore_missing_mtab);
 			return 0;
 		}
