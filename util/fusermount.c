@@ -205,6 +205,7 @@ static int may_unmount(const char *mnt, int quiet)
 		fclose (pFile);
 	} else {
 		const char* ignore_missing_mtab = getenv("OCEAN_IO_IGNORE_MISSING_MTAB");
+		fprintf(stderr, "%s: TSZZ file %s does not exists\nOCEAN_IO_IGNORE_MISSING_MTAB=%s\n", progname, mtab, ignore_missing_mtab);
 		if (ignore_missing_mtab != NULL && strcmp(ignore_missing_mtab,"TRUE") == 0) {
 			fprintf(stderr, "%s: TSZZ file %s does not exists\nExiting anyway.\nOCEAN_IO_IGNORE_MISSING_MTAB=%s\n", progname, mtab, ignore_missing_mtab);
 			return 0;
