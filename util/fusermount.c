@@ -41,6 +41,7 @@
 static const char *progname;
 
 static int user_allow_other = 0;
+static int allow_missing_mtab = 0;
 static int mount_max = 1000;
 
 static int auto_unmount = 0;
@@ -194,25 +195,24 @@ static int may_unmount(const char *mnt, int quiet)
 	if (user == NULL)
 		return -1;
 
-	/* OCEAN_IO_IGNORE_MISSING_MTAB start
-		mtab missing file ignore
+	/* allow_missing_mtab start
+		mtab missing file is ignored
+		in case of kubernetes mtab is linked to mounts
+		/etc/mtab -> ../proc/self/mounts
 	*/
-	FILE * pFile;
+	if (allow_missing_mtab) {
 
-	pFile = fopen (mtab, "r");
-	if (pFile!=NULL) {
-		fprintf(stderr, "%s: TSZZ file %s can be open for read\n", progname, mtab);
-		fclose (pFile);
-	} else {
-		char* ignore_missing_mtab;
-		ignore_missing_mtab = getenv("OCEAN_IO_IGNORE_MISSING_MTAB");
-		fprintf(stderr, "%s: TSZZ file %s does not exists\nOCEAN_IO_IGNORE_MISSING_MTAB=%s\n", progname, mtab, ignore_missing_mtab);
-		if (ignore_missing_mtab != NULL && strcmp(ignore_missing_mtab, "TRUE") == 0) {
-			fprintf(stderr, "%s: TSZZ file %s does not exists\nExiting anyway.\nOCEAN_IO_IGNORE_MISSING_MTAB=%s\n", progname, mtab, ignore_missing_mtab);
+		FILE * pFile;
+		pFile = fopen (mtab, "r");
+		if (pFile!=NULL) {
+			fclose (pFile);
+		} else {
+			
+			fprintf(stderr, "%s: INFO: file %s does not exists\nExiting ...\n", progname, mtab);
 			return 0;
 		}
 	}
-	/*  OCEAN_IO_IGNORE_MISSING_MTAB end */
+	/* allow_missing_mtab end */
 
 	fp = setmntent(mtab, "r");
 	if (fp == NULL) {
@@ -570,6 +570,8 @@ static void parse_line(char *line, int linenum)
 	int tmp;
 	if (strcmp(line, "user_allow_other") == 0)
 		user_allow_other = 1;
+	else if (strcmp(line, "allow_missing_mtab") == 0)
+		allow_missing_mtab = 1;
 	else if (sscanf(line, "mount_max = %i", &tmp) == 1)
 		mount_max = tmp;
 	else if(line[0])
