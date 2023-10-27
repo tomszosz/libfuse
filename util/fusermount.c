@@ -188,15 +188,34 @@ static int may_unmount(const char *mnt, int quiet)
 	char uidstr[32];
 	unsigned uidlen = 0;
 	int found;
+	int allow_missing_mtab = 1;
 	const char *mtab = _PATH_MOUNTED;
 
 	user = get_user_name();
 	if (user == NULL)
 		return -1;
 
+	/* allow_missing_mtab start
+		mtab missing file is ignored
+		in case of kubernetes mtab is linked to mounts
+		/etc/mtab -> ../proc/self/mounts
+	*/
+	if (allow_missing_mtab == 1) {
+
+		FILE * pFile;
+		pFile = fopen (mtab, "r");
+		if (pFile!=NULL) {
+			fclose (pFile);
+		} else {
+			fprintf(stderr, "%s: INFO: file %s does not exists\nExiting ...\n", progname, mtab);
+			return 0;
+		}
+	}
+	/* allow_missing_mtab end */
+
 	fp = setmntent(mtab, "r");
 	if (fp == NULL) {
-		fprintf(stderr, "%s: failed to open %s: %s\n", progname, mtab,
+		fprintf(stderr, "%s: failed [:199] to open %s: %s\n", progname, mtab,
 			strerror(errno));
 		return -1;
 	}
@@ -495,7 +514,7 @@ static int count_fuse_fs(void)
 	const char *mtab = _PATH_MOUNTED;
 	FILE *fp = setmntent(mtab, "r");
 	if (fp == NULL) {
-		fprintf(stderr, "%s: failed to open %s: %s\n", progname, mtab,
+		fprintf(stderr, "%s: failed [:498] to open %s: %s\n", progname, mtab,
 			strerror(errno));
 		return -1;
 	}
